@@ -53,6 +53,7 @@ class WARP:
 
     def run_method(self):
         theta_init = torch.load(self.sft_weights_path)
+        theta_i_slerp = copy.deepcopy(theta_init)
 
         self.rewards = []
         for i in range(self.I):
@@ -105,6 +106,10 @@ class WARP:
             # Update theta_init towards theta_i_slerp
             theta_init = self.liti_update(theta_init, theta_i_slerp)
             print("Finished i =", i)
+        
+        # Save final model for generation
+        self.final_init_model = copy.deepcopy(self.model)
+        self.final_init_model.load_state_dict(theta_init)
 
         # Save outputs
         output_weights = self.output_update(self.theta_sft, theta_i_slerp)
