@@ -1,4 +1,3 @@
-from multiprocessing import Process
 import torch
 import numpy as np
 import copy
@@ -6,7 +5,6 @@ from datasets import Dataset
 import numpy as np
 import torch
 import torch.nn as nn
-from tqdm.notebook import trange
 from trl.core import LengthSampler
 
 class WARP:
@@ -19,7 +17,6 @@ class WARP:
         self.sft_weights_path = "sft_weights.pt"
 
         self.model = model
-        # self.theta_sft = nn.utils.parameters_to_vector(self.model.parameters())
         torch.save(self.model.state_dict(), self.sft_weights_path)
         self.theta_sft = torch.load(self.sft_weights_path)
         self.tokenizer = tokenizer
@@ -60,12 +57,11 @@ class WARP:
         self.rewards = []
         for i in range(self.I):
             print("Started i =", i)
-            # mean_rewards = []
             theta_list = []
             processes = []
             for m in range(self.M):
                 print("Started m =", m)
-                # rewards = []
+
                 theta_m = copy.deepcopy(theta_init)
                 theta_m_ema = copy.deepcopy(theta_init)
 
@@ -80,9 +76,7 @@ class WARP:
                     # Generate completion
                     x = np.random.choice(self.prompt_dataset)
                     print("Query:", x["query"])
-                    # print("X[input_ids]: ", x["input_ids"][None, :])
                     y = self.generate_completion(theta_m_model, x["input_ids"])
-                    # print("Y: ", y)
 
                     # Compute reward with KL regularization
                     r_beta = self.compute_reward(y, x["input_ids"],
@@ -104,7 +98,6 @@ class WARP:
 
                 theta_list.append(theta_m)
                 print("Finished m =", m)
-                # mean_rewards.append(np.mean(rewards))
 
             # SLERP to merge M weights
             theta_i_slerp = self.slerp(theta_init, theta_list)
@@ -113,11 +106,10 @@ class WARP:
             theta_init = self.liti_update(theta_init, theta_i_slerp)
             print("Finished i =", i)
 
-            # Save rewards after iteration
-            # self.rewards_by_iteration.append(np.mean(self.mean_rewards))
-            output_weights = self.output_update(self.theta_sft, theta_i_slerp)
-            output_model = copy.deepcopy(self.model)
-            output_model.load_state_dict(output_weights)
+        # Save outputs
+        output_weights = self.output_update(self.theta_sft, theta_i_slerp)
+        output_model = copy.deepcopy(self.model)
+        output_model.load_state_dict(output_weights)
 
         return output_model
 
@@ -141,11 +133,6 @@ class WARP:
         for token_id in range(num_generated):
             token_prob = torch.sigmoid(output["scores"][token_id][0])
             token_prob = np.clip(token_prob, self.eps, 1 - self.eps)
-            # for id in range(token_prob.shape[0]):
-            #     if token_prob[id] == 0:
-            #         token_prob[id] += self.eps
-            #     elif token_prob[id] == 1:
-            #         token_prob[id] -= self.eps
             probs.append(torch.log(token_prob))
         # Compute completion log_prob
         prompt_len = len(x)
