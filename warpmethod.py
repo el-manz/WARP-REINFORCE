@@ -100,6 +100,10 @@ class WARP:
                 theta_list.append(theta_m)
                 print("Finished m =", m)
 
+            # Save last model before interpolation
+            self.model_before_interp = copy.deepcopy(self.model)
+            self.model_before_interp.load_state_dict(theta_list[-1])
+
             # SLERP to merge M weights
             theta_i_slerp = self.slerp(theta_init, theta_list)
 
