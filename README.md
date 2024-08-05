@@ -1,6 +1,7 @@
 # WARP-REINFORCE
 
-Реализация метода WARP из статьи [WARP: On the Benefits of Weight Averaged Rewarded Policies](https://arxiv.org/pdf/2406.16768) для задачи Reinforcement Learning from Human Feedback. \ Генерируем положительные отзывы на основе датасета [imdb](https://huggingface.co/datasets/stanfordnlp/imdb).
+Реализация метода WARP из статьи [WARP: On the Benefits of Weight Averaged Rewarded Policies](https://arxiv.org/pdf/2406.16768) для задачи Reinforcement Learning from Human Feedback.\
+Генерируем положительные отзывы на основе датасета [imdb](https://huggingface.co/datasets/stanfordnlp/imdb).
 
 ## Как запускать решение полностью?
 В репозитории лежат файлы с необходимыми классами:
