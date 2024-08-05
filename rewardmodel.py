@@ -23,7 +23,7 @@ from tqdm.notebook import trange
 from typing import Any, Dict, List, Optional, Union
 from peft import LoraConfig, TaskType, get_peft_model, PeftModel
 
-from trl.core import LengthSampler\
+from trl.core import LengthSampler
 
 @dataclass
 class RewardDataCollatorWithPadding:
